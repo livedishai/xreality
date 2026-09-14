@@ -1,0 +1,25 @@
+{
+  "name": "JEWELS-AI | Collection Showcase",
+  "short_name": "Jewels AI",
+  "description": "Browse our latest bridal, necklace, bangle and ring collections.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#130821",
+  "theme_color": "#130821",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
