@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>JEWELS-AI | Collection Showcase</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- OneSignal Web Push SDK -->
+  <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+  <script>
+    window.OneSignalDeferred = window.OneSignalDeferred || [];
+    OneSignalDeferred.push(async function (OneSignal) {
+      await OneSignal.init({
+        appId: "5e3973b3-183d-4bc7-ab77-cb53abc6c114",
+      });
+    });
+  </script>
+
+  <style>
+    :root {
+      --deep: #130821;
+      --deep-2: #1f0d33;
+      --gold: #D4AF37;
+      --gold-soft: #F0D687;
+      --cream: #F5EFE6;
+      --cream-dim: rgba(245, 239, 230, 0.62);
+      --glass: rgba(245, 239, 230, 0.08);
+      --glass-border: rgba(212, 175, 55, 0.35);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      background: var(--deep);
+      overflow: hidden;
+      font-family: 'Manrope', sans-serif;
+      color: var(--cream);
+      -webkit-tap-highlight-color: transparent;
+      height: 100%;
+      width: 100%;
+    }
+
+    #catalogSheet {
+      position: fixed;
+      inset: 0;
+      height: 100dvh;
+      width: 100vw;
+      background:
+        radial-gradient(ellipse at 20% -10%, rgba(94,15,139,0.45) 0%, transparent 55%),
+        radial-gradient(ellipse at 100% 0%, rgba(212,175,55,0.12) 0%, transparent 45%),
+        linear-gradient(180deg, var(--deep-2) 0%, var(--deep) 100%);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transform-style: preserve-3d;
+      perspective: 2200px;
+    }
+
+    #catalogSheet::before {
+      content: "";
+      position: absolute;
+      left: 0; right: 0; bottom: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      opacity: 0.7;
+    }
+
+    .sparkle-field {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .sparkle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: var(--gold);
+      box-shadow: 0 0 10px 1px rgba(212,175,55,0.8);
+      animation-name: sparkleFloat;
+      animation-timing-function: ease-in-out;
+      animation-iteration-count: infinite;
+    }
+
+    @keyframes sparkleFloat {
+      0%, 100% { transform: translateY(0) scale(0.8); opacity: 0.25; }
+      50%      { transform: translateY(-18px) scale(1.2); opacity: 0.9; }
+    }
+
+    .sheet-header {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: max(18px, env(safe-area-inset-top)) 20px 16px;
+      background: linear-gradient(180deg, rgba(19,8,33,0.9) 0%, rgba(19,8,33,0) 100%);
+      flex-shrink: 0;
+    }
+
+    .back-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      border: 1px solid var(--glass-border);
+      background: var(--glass);
+      color: var(--gold-soft);
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: transform 0.15s ease, background 0.15s ease;
+    }
+    .back-btn:active { transform: scale(0.9); }
+
+    .sheet-header-text { display: flex; flex-direction: column; gap: 2px; flex: 1; }
+
+    .notify-btn {
+      margin-left: auto;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      border: 1px solid var(--glass-border);
+      background: var(--glass);
+      color: var(--gold-soft);
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: transform 0.15s ease, background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+    }
+    .notify-btn:active { transform: scale(0.9); }
+    .notify-btn.subscribed {
+      background: var(--gold);
+      color: var(--deep);
+      border-color: var(--gold);
+    }
+
+    .sheet-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 25px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      line-height: 1.1;
+      background: linear-gradient(100deg, var(--gold-soft) 20%, #fff 45%, var(--gold-soft) 70%);
+      background-size: 220% auto;
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: titleShine 2.2s ease-out 0.35s 1;
+    }
+
+    @keyframes titleShine {
+      0%   { background-position: 200% center; }
+      100% { background-position: 0% center; }
+    }
+
+    .sheet-subtitle {
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--cream-dim);
+    }
+
+    .category-scroll {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      gap: 10px;
+      padding: 2px 20px 16px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      flex-shrink: 0;
+    }
+    .category-scroll::-webkit-scrollbar { display: none; }
+
+    .category-chip {
+      padding: 8px 18px;
+      border-radius: 999px;
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      color: var(--cream);
+      font-size: 12px;
+      letter-spacing: 1px;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-transform: capitalize;
+    }
+
+    .category-chip.active {
+      background: var(--gold);
+      color: var(--deep);
+      border-color: var(--gold);
+      font-weight: 700;
+    }
+
+    .catalog-grid {
+      position: relative;
+      z-index: 1;
+      flex: 1;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      padding: 6px 20px 40px;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      transform-style: preserve-3d;
+      perspective: 900px;
+    }
+
+    .catalog-card {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--glass-border);
+      border-radius: 14px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      transform-style: preserve-3d;
+      will-change: transform;
+      transition: transform 0.12s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+      opacity: 0;
+      animation: cardRise 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    @keyframes cardRise {
+      from { opacity: 0; transform: translateY(26px) rotateX(18deg) scale(0.92); }
+      to   { opacity: 1; transform: translateY(0) rotateX(0) scale(1); }
+    }
+
+    .catalog-card .thumb-wrap {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1;
+      border-radius: 10px;
+      overflow: hidden;
+      transform-style: preserve-3d;
+    }
+
+    .catalog-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transform: translateZ(0);
+    }
+
+    .catalog-card .thumb-wrap::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(115deg, transparent 35%, rgba(255,255,255,0.28) 48%, transparent 60%);
+      transform: translateX(-120%);
+      pointer-events: none;
+    }
+    .catalog-card:hover .thumb-wrap::after,
+    .catalog-card.tilting .thumb-wrap::after {
+      transform: translateX(120%);
+      transition: transform 0.7s ease;
+    }
+
+    .like-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      border: 1px solid var(--glass-border);
+      background: rgba(19, 8, 33, 0.55);
+      backdrop-filter: blur(4px);
+      color: var(--cream);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      line-height: 1;
+      cursor: pointer;
+      z-index: 3;
+      transition: transform 0.15s ease, background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+    }
+    .like-btn:active { transform: scale(0.85); }
+    .like-btn.liked {
+      background: var(--gold);
+      border-color: var(--gold);
+      color: var(--deep);
+    }
+    .like-btn.liked svg { fill: var(--deep); }
+    .like-btn svg {
+      width: 15px;
+      height: 15px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+    }
+
+    .interest-btn {
+      margin-top: 2px;
+      width: 100%;
+      padding: 7px 6px;
+      border-radius: 8px;
+      border: 1px solid var(--glass-border);
+      background: transparent;
+      color: var(--gold-soft);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.15s ease, color 0.15s ease, transform 0.1s ease;
+    }
+    .interest-btn:active { transform: scale(0.96); }
+    .interest-btn.sent {
+      background: var(--gold);
+      color: var(--deep);
+      border-color: var(--gold);
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: max(24px, env(safe-area-inset-bottom));
+      transform: translateX(-50%) translateY(20px);
+      background: var(--gold);
+      color: var(--deep);
+      font-size: 12.5px;
+      font-weight: 700;
+      padding: 10px 18px;
+      border-radius: 999px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+      z-index: 50;
+      white-space: nowrap;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .catalog-card .name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--cream);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .catalog-card .tag {
+      font-size: 10px;
+      text-transform: uppercase;
+      color: var(--gold-soft);
+      letter-spacing: 1px;
+    }
+
+    .catalog-empty {
+      grid-column: span 2;
+      text-align: center;
+      color: var(--cream-dim);
+      padding: 60px 0;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 17px;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="catalogSheet">
+    <div class="sparkle-field" id="sparkleField"></div>
+
+    <div class="sheet-header">
+      <button class="back-btn" id="closeCatalogBtn" onclick="window.history.back()">←</button>
+      <div class="sheet-header-text">
+        <div class="sheet-title">Collection Showcase</div>
+        <div class="sheet-subtitle">Tap a piece to catch the light</div>
+      </div>
+      <button class="notify-btn" id="notifyBtn" aria-label="Get notified about new arrivals" title="Get notified about new arrivals">🔔</button>
+    </div>
+
+    <div class="category-scroll" id="categoryTabs">
+      <button class="category-chip active" data-cat="all">All</button>
+      <button class="category-chip" data-cat="bridal">Bridal</button>
+      <button class="category-chip" data-cat="necklaces">Necklaces</button>
+      <button class="category-chip" data-cat="bangles">Bangles</button>
+      <button class="category-chip" data-cat="rings">Rings</button>
+    </div>
+
+    <div class="catalog-grid" id="catalogList"></div>
+  </div>
+
+  <script>
+    const API_KEY = "AIzaSyA_mBu6emRKASkqHpLtwkdBiCQKYO3rvcw"; 
+
+    // 📌 Put the shop owner's WhatsApp number here — country code, no +, no spaces or dashes.
+    // Example: for India, +91 98765 43210 becomes "919876543210"
+    const OWNER_WHATSAPP_NUMBER = "919999999999";
+
+    const CATALOG_FOLDERS = {
+      bangles: "1loeb_40A3eOjzB2PnY24MXsxKFsE06L-",
+      bridal: "1RQJWVfvRpvcQw_DdhWxZKB18-GzKoD3B",
+      necklaces: "1Zmg8bnpmOChwqwrVWFeBCvXxOEQihC3Q",
+      rings: "1Xz92BSq1jtdxJyiKO5o7lzx0bepnDQzz"
+    };
+
+    let CATALOG_ITEMS = [];
+    const likedIds = new Set();
+
+    const catalogList = document.querySelector("#catalogList");
+    const categoryTabs = document.querySelectorAll(".category-chip");
+
+    function buildSparkleField() {
+      const field = document.querySelector("#sparkleField");
+      const count = 18;
+      for (let i = 0; i < count; i++) {
+        const s = document.createElement("div");
+        s.className = "sparkle";
+        s.style.left = Math.random() * 100 + "%";
+        s.style.top = Math.random() * 100 + "%";
+        s.style.animationDuration = (2.5 + Math.random() * 3) + "s";
+        s.style.animationDelay = (Math.random() * 3) + "s";
+        s.style.opacity = (0.2 + Math.random() * 0.5).toFixed(2);
+        field.appendChild(s);
+      }
+    }
+
+    function attachTilt(card) {
+      const maxTilt = 12;
+
+      function updateTilt(clientX, clientY) {
+        const rect = card.getBoundingClientRect();
+        const px = (clientX - rect.left) / rect.width;
+        const py = (clientY - rect.top) / rect.height;
+        const rx = (0.5 - py) * maxTilt;
+        const ry = (px - 0.5) * maxTilt;
+        card.style.transform = `rotateX(${rx}deg) rotateY(${ry}deg) scale(1.04)`;
+        card.classList.add("tilting");
+      }
+
+      function resetTilt() {
+        card.style.transform = "";
+        card.classList.remove("tilting");
+      }
+
+      card.addEventListener("pointermove", (e) => updateTilt(e.clientX, e.clientY));
+      card.addEventListener("pointerdown", (e) => updateTilt(e.clientX, e.clientY));
+      card.addEventListener("pointerleave", resetTilt);
+      card.addEventListener("pointerup", () => setTimeout(resetTilt, 120));
+    }
+
+    function showToast(message) {
+      let toast = document.querySelector(".toast");
+      if (!toast) {
+        toast = document.createElement("div");
+        toast.className = "toast";
+        document.body.appendChild(toast);
+      }
+      toast.textContent = message;
+      toast.classList.add("show");
+      clearTimeout(toast._hideTimer);
+      toast._hideTimer = setTimeout(() => toast.classList.remove("show"), 2200);
+    }
+
+    // Sends the "I'm interested" message straight to the shop owner's WhatsApp,
+    // pre-filled with the product name and category.
+    function notifyOwnerOfInterest(item) {
+      const message =
+        `Hi! I'm interested in this piece from your catalog:\n` +
+        `• ${item.name}\n` +
+        `• Category: ${item.category}\n\n` +
+        `Could you share more details (price, availability)?`;
+      const url = `https://wa.me/${OWNER_WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+      window.open(url, "_blank", "noopener");
+    }
+
+    function toggleLike(item, likeBtn) {
+      const isLiked = likedIds.has(item.id);
+      if (isLiked) {
+        likedIds.delete(item.id);
+        likeBtn.classList.remove("liked");
+      } else {
+        likedIds.add(item.id);
+        likeBtn.classList.add("liked");
+        showToast("Added to your favorites ♥");
+      }
+    }
+
+    async function fetchDriveCatalog() {
+      const items = [];
+      const fetchPromises = Object.entries(CATALOG_FOLDERS).map(async ([catName, folderId]) => {
+        try {
+          const query = encodeURIComponent(`'${folderId}' in parents and mimeType contains 'image/' and trashed=false`);
+          const url = `https://www.googleapis.com/drive/v3/files?q=${query}&fields=files(id,name)&pageSize=30&key=${API_KEY}`;
+          const res = await fetch(url);
+          const data = await res.json();
+
+          if (data.files && data.files.length > 0) {
+            data.files.forEach(file => {
+              const cleanTitle = file.name.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " ");
+              items.push({
+                id: file.id,
+                name: cleanTitle,
+                category: catName,
+                img: `https://drive.google.com/thumbnail?id=${file.id}&sz=w800`
+              });
+            });
+          }
+        } catch (err) {
+          console.error(`Error loading category: ${catName}`, err);
+        }
+      });
+
+      await Promise.all(fetchPromises);
+      CATALOG_ITEMS = items;
+      return items;
+    }
+
+    function renderCatalog(filter = "all") {
+      catalogList.innerHTML = "";
+      const filtered = filter === "all" ? CATALOG_ITEMS : CATALOG_ITEMS.filter(i => i.category === filter);
+
+      if (filtered.length === 0) {
+        catalogList.innerHTML = `<div class="catalog-empty">No items found in this collection.</div>`;
+        return;
+      }
+
+      filtered.forEach((item, i) => {
+        const card = document.createElement("div");
+        card.className = "catalog-card";
+        card.style.animationDelay = Math.min(i * 55, 500) + "ms";
+        const isLiked = likedIds.has(item.id);
+        card.innerHTML = `
+          <div class="thumb-wrap">
+            <img src="${item.img}" alt="${item.name}" loading="lazy" />
+            <button class="like-btn${isLiked ? " liked" : ""}" aria-label="Save to favorites">
+              <svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.87-10-9.4C.5 8.1 2.4 4.8 6 4.8c2 0 3.3 1 4 2.1.7-1.1 2-2.1 4-2.1 3.6 0 5.5 3.3 4 6.8-2.5 4.53-10 9.4-10 9.4z"/></svg>
+            </button>
+          </div>
+          <div class="tag">${item.category}</div>
+          <div class="name">${item.name}</div>
+          <button class="interest-btn">I'm Interested</button>
+        `;
+
+        const likeBtn = card.querySelector(".like-btn");
+        likeBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          toggleLike(item, likeBtn);
+        });
+
+        const interestBtn = card.querySelector(".interest-btn");
+        interestBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          notifyOwnerOfInterest(item);
+          interestBtn.textContent = "Sent ✓";
+          interestBtn.classList.add("sent");
+          showToast("Opening WhatsApp to notify the shop…");
+          setTimeout(() => {
+            interestBtn.textContent = "I'm Interested";
+            interestBtn.classList.remove("sent");
+          }, 2500);
+        });
+
+        catalogList.appendChild(card);
+        attachTilt(card);
+      });
+    }
+
+    function setupNotifyButton() {
+      const notifyBtn = document.querySelector("#notifyBtn");
+      if (!notifyBtn) return;
+
+      window.OneSignalDeferred = window.OneSignalDeferred || [];
+
+      // Reflect current subscription state on load
+      OneSignalDeferred.push(async function (OneSignal) {
+        const isSubscribed = OneSignal.User.PushSubscription.optedIn;
+        if (isSubscribed) {
+          notifyBtn.classList.add("subscribed");
+          notifyBtn.textContent = "🔔";
+        }
+      });
+
+      notifyBtn.addEventListener("click", () => {
+        OneSignalDeferred.push(async function (OneSignal) {
+          const alreadySubscribed = OneSignal.User.PushSubscription.optedIn;
+          if (alreadySubscribed) {
+            showToast("You're already getting new arrival alerts ✓");
+            return;
+          }
+          await OneSignal.Notifications.requestPermission();
+          const nowSubscribed = OneSignal.User.PushSubscription.optedIn;
+          if (nowSubscribed) {
+            notifyBtn.classList.add("subscribed");
+            showToast("You'll be notified about new arrivals ✨");
+          } else {
+            showToast("Notifications weren't enabled — you can try again anytime");
+          }
+        });
+      });
+    }
+
+    window.addEventListener("DOMContentLoaded", async () => {
+      buildSparkleField();
+      setupNotifyButton();
+      catalogList.innerHTML = `<div class="catalog-empty">Loading Collections…</div>`;
+      await fetchDriveCatalog();
+      renderCatalog("all");
+
+      categoryTabs.forEach(chip => {
+        chip.addEventListener("click", () => {
+          categoryTabs.forEach(c => c.classList.remove("active"));
+          chip.classList.add("active");
+          renderCatalog(chip.dataset.cat);
+        });
+      });
+    });
+
+    document.addEventListener("contextmenu", (e) => e.preventDefault());
+  </script>
+</body>
+</html>
