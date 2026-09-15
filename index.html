@@ -245,41 +245,6 @@
       transition: transform 0.7s ease;
     }
 
-    .like-btn {
-      position: absolute;
-      top: 8px;
-      right: 8px;
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      border: 1px solid var(--glass-border);
-      background: rgba(19, 8, 33, 0.55);
-      backdrop-filter: blur(4px);
-      color: var(--cream);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 15px;
-      line-height: 1;
-      cursor: pointer;
-      z-index: 3;
-      transition: transform 0.15s ease, background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
-    }
-    .like-btn:active { transform: scale(0.85); }
-    .like-btn.liked {
-      background: var(--gold);
-      border-color: var(--gold);
-      color: var(--deep);
-    }
-    .like-btn.liked svg { fill: var(--deep); }
-    .like-btn svg {
-      width: 15px;
-      height: 15px;
-      fill: none;
-      stroke: currentColor;
-      stroke-width: 2;
-    }
-
     .interest-btn {
       margin-top: 2px;
       width: 100%;
@@ -323,6 +288,30 @@
     .toast.show {
       opacity: 1;
       transform: translateX(-50%) translateY(0);
+    }
+
+    .burst-particle {
+      position: fixed;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--gold-soft);
+      box-shadow: 0 0 6px 1px rgba(212, 175, 55, 0.9);
+      pointer-events: none;
+      z-index: 60;
+      opacity: 0;
+      animation: burstDrift 0.9s ease-out forwards;
+    }
+
+    @keyframes burstDrift {
+      0% {
+        opacity: 1;
+        transform: translate(0, 0) scale(1);
+      }
+      100% {
+        opacity: 0;
+        transform: translate(var(--dx), var(--dy)) scale(0.4);
+      }
     }
 
     .catalog-card .name {
@@ -391,7 +380,6 @@
     };
 
     let CATALOG_ITEMS = [];
-    const likedIds = new Set();
 
     const catalogList = document.querySelector("#catalogList");
     const categoryTabs = document.querySelectorAll(".category-chip");
@@ -448,6 +436,34 @@
       toast._hideTimer = setTimeout(() => toast.classList.remove("show"), 2200);
     }
 
+    // Spawns a small burst of gold particles drifting upward from the given button,
+    // then removes them once the animation finishes.
+    function spawnSparkleBurst(button) {
+      const rect = button.getBoundingClientRect();
+      const originX = rect.left + rect.width / 2;
+      const originY = rect.top + rect.height / 2;
+      const count = 10;
+
+      for (let i = 0; i < count; i++) {
+        const particle = document.createElement("div");
+        particle.className = "burst-particle";
+
+        const angle = Math.random() * Math.PI - Math.PI / 2; // upward-biased spread
+        const distance = 30 + Math.random() * 40;
+        const dx = Math.sin(angle) * distance;
+        const dy = -Math.abs(Math.cos(angle) * distance) - 20; // always drifts up
+
+        particle.style.left = originX + (Math.random() * rect.width - rect.width / 2) + "px";
+        particle.style.top = originY + "px";
+        particle.style.setProperty("--dx", dx + "px");
+        particle.style.setProperty("--dy", dy + "px");
+        particle.style.animationDelay = (Math.random() * 0.15) + "s";
+
+        document.body.appendChild(particle);
+        particle.addEventListener("animationend", () => particle.remove());
+      }
+    }
+
     // Sends the "I'm interested" message straight to the shop owner's WhatsApp,
     // pre-filled with the product name and category.
     function notifyOwnerOfInterest(item) {
@@ -458,18 +474,6 @@
         `Could you share more details (price, availability)?`;
       const url = `https://wa.me/${OWNER_WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
       window.open(url, "_blank", "noopener");
-    }
-
-    function toggleLike(item, likeBtn) {
-      const isLiked = likedIds.has(item.id);
-      if (isLiked) {
-        likedIds.delete(item.id);
-        likeBtn.classList.remove("liked");
-      } else {
-        likedIds.add(item.id);
-        likeBtn.classList.add("liked");
-        showToast("Added to your favorites ♥");
-      }
     }
 
     async function fetchDriveCatalog() {
@@ -515,28 +519,19 @@
         const card = document.createElement("div");
         card.className = "catalog-card";
         card.style.animationDelay = Math.min(i * 55, 500) + "ms";
-        const isLiked = likedIds.has(item.id);
         card.innerHTML = `
           <div class="thumb-wrap">
             <img src="${item.img}" alt="${item.name}" loading="lazy" />
-            <button class="like-btn${isLiked ? " liked" : ""}" aria-label="Save to favorites">
-              <svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.87-10-9.4C.5 8.1 2.4 4.8 6 4.8c2 0 3.3 1 4 2.1.7-1.1 2-2.1 4-2.1 3.6 0 5.5 3.3 4 6.8-2.5 4.53-10 9.4-10 9.4z"/></svg>
-            </button>
           </div>
           <div class="tag">${item.category}</div>
           <div class="name">${item.name}</div>
           <button class="interest-btn">I'm Interested</button>
         `;
 
-        const likeBtn = card.querySelector(".like-btn");
-        likeBtn.addEventListener("click", (e) => {
-          e.stopPropagation();
-          toggleLike(item, likeBtn);
-        });
-
         const interestBtn = card.querySelector(".interest-btn");
         interestBtn.addEventListener("click", (e) => {
           e.stopPropagation();
+          spawnSparkleBurst(interestBtn);
           notifyOwnerOfInterest(item);
           interestBtn.textContent = "Sent ✓";
           interestBtn.classList.add("sent");
