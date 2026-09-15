@@ -292,25 +292,35 @@
 
     .burst-particle {
       position: fixed;
-      width: 5px;
-      height: 5px;
       border-radius: 50%;
-      background: var(--gold-soft);
-      box-shadow: 0 0 6px 1px rgba(212, 175, 55, 0.9);
       pointer-events: none;
       z-index: 60;
       opacity: 0;
-      animation: burstDrift 0.9s ease-out forwards;
+      animation: burstDrift 1.1s cubic-bezier(0.25, 0.8, 0.35, 1) forwards;
+    }
+
+    .burst-particle.dot {
+      background: var(--gold-soft);
+      box-shadow: 0 0 6px 1px rgba(212, 175, 55, 0.9);
+    }
+
+    .burst-particle.diamond {
+      background: var(--gold);
+      border-radius: 2px;
+      box-shadow: 0 0 6px 1px rgba(240, 214, 135, 0.9);
     }
 
     @keyframes burstDrift {
       0% {
         opacity: 1;
-        transform: translate(0, 0) scale(1);
+        transform: translate(0, 0) rotate(0deg) scale(1);
+      }
+      70% {
+        opacity: 1;
       }
       100% {
         opacity: 0;
-        transform: translate(var(--dx), var(--dy)) scale(0.4);
+        transform: translate(var(--dx), var(--dy)) rotate(var(--rot)) scale(0.3);
       }
     }
 
@@ -436,28 +446,34 @@
       toast._hideTimer = setTimeout(() => toast.classList.remove("show"), 2200);
     }
 
-    // Spawns a small burst of gold particles drifting upward from the given button,
-    // then removes them once the animation finishes.
+    // Spawns a celebratory burst of gold particles radiating outward from the given
+    // button in all directions, then removes them once the animation finishes.
     function spawnSparkleBurst(button) {
       const rect = button.getBoundingClientRect();
       const originX = rect.left + rect.width / 2;
       const originY = rect.top + rect.height / 2;
-      const count = 10;
+      const count = 28;
 
       for (let i = 0; i < count; i++) {
         const particle = document.createElement("div");
-        particle.className = "burst-particle";
+        const isDiamond = Math.random() < 0.35;
+        particle.className = "burst-particle " + (isDiamond ? "diamond" : "dot");
 
-        const angle = Math.random() * Math.PI - Math.PI / 2; // upward-biased spread
-        const distance = 30 + Math.random() * 40;
-        const dx = Math.sin(angle) * distance;
-        const dy = -Math.abs(Math.cos(angle) * distance) - 20; // always drifts up
+        // Full 360° spread with a slight upward bias so it still feels like it "rises"
+        const angle = (i / count) * Math.PI * 2 + (Math.random() * 0.5 - 0.25);
+        const distance = 40 + Math.random() * 70;
+        const dx = Math.cos(angle) * distance;
+        const dy = Math.sin(angle) * distance - 25;
 
-        particle.style.left = originX + (Math.random() * rect.width - rect.width / 2) + "px";
+        const size = isDiamond ? 6 + Math.random() * 4 : 4 + Math.random() * 3;
+        particle.style.width = size + "px";
+        particle.style.height = size + "px";
+        particle.style.left = originX + "px";
         particle.style.top = originY + "px";
         particle.style.setProperty("--dx", dx + "px");
         particle.style.setProperty("--dy", dy + "px");
-        particle.style.animationDelay = (Math.random() * 0.15) + "s";
+        particle.style.setProperty("--rot", (Math.random() * 360 - 180) + "deg");
+        particle.style.animationDelay = (Math.random() * 0.12) + "s";
 
         document.body.appendChild(particle);
         particle.addEventListener("animationend", () => particle.remove());
